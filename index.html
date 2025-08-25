@@ -186,6 +186,7 @@
     <div class="container">
         <div class="header">
             <h1>Places Disponibles</h1>
+            <div class="subtitle">Cours et formations disponibles</div>
         </div>
         
         <div id="loading" class="loading">
@@ -236,6 +237,18 @@
         function renderCourses(coursesData) {
             const container = document.getElementById('courses-container');
             container.innerHTML = '';
+            
+            // Vérification que coursesData existe et est un tableau
+            if (!coursesData || !Array.isArray(coursesData)) {
+                console.error('Données des cours invalides:', coursesData);
+                showError();
+                return;
+            }
+            
+            if (coursesData.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px; color: #6c757d;">Aucun cours disponible pour le moment</div>';
+                return;
+            }
             
             coursesData.forEach(course => {
                 const parsed = parseCourseName(course.Place_dispo);
@@ -298,10 +311,12 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                const data = await response.json();
+                const coursesData = await response.json();
+                console.log('Données récupérées:', coursesData); // Pour debug
+                
                 const lastModified = response.headers.get('Last-Modified');
                 
-                renderCourses(data.courses);
+                renderCourses(coursesData);
                 updateTimestamp(lastModified);
                 showCourses();
                 
